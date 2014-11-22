@@ -1,8 +1,9 @@
-# herbrand-prolog
+herbrand-prolog [![Build Status](https://secure.travis-ci.org/joom/herbrand-prolog.svg)](http://travis-ci.org/joom/herbrand-prolog)
+=====
 
 A pseudo-Prolog that tries to answer queries by building the least Herbrand model.
 
-Written as a final project for COMP360 Computational Logic and Logic Programming, Fall 2014, Prof. Lipton, Wesleyan University.
+Written as a final project for COMP360 Computational Logic and Logic Programming, Fall 2014, Prof. Lipton, Wesleyan University. In progress.
 
 ## Implementation Problems
 
