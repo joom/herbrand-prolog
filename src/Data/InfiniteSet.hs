@@ -18,9 +18,12 @@
 module Data.InfiniteSet
 where
 
+import Prelude hiding (map)
+import qualified Data.List as L
+
 data Set a = Set   [a]
            | Union [Set a]
-           deriving Eq
+           deriving (Show, Eq)
 
 -- Query
 
@@ -34,7 +37,7 @@ null _        = False
 -- Will not terminate if the set is infinite, use at your own risk.
 size :: Set a -> Int
 size (Set   xs) = length xs
-size (Union xs) = sum $ map size xs
+size (Union xs) = sum $ L.map size xs
 
 -- | Is the element in the set?
 -- If the set is infinite and the element is not found,
@@ -73,7 +76,7 @@ insert x (Union (y:ys)) = Union $ insert x y : ys
 -- it is replaced with the new value.
 delete :: Eq a => a -> Set a -> Set a
 delete x (Set   xs) = Set $ filter (== x) xs
-delete x (Union xs) = Union $ map (delete x) xs
+delete x (Union xs) = Union $ L.map (delete x) xs
 
 -- Combine
 
@@ -87,6 +90,13 @@ union x@(Union xs) y@(Union ys) = Union [x, y] -- this might change
 -- | The union of a list of sets.
 unions :: [Set a] -> Set a
 unions = foldl union empty
+
+-- Map
+
+-- map f s is the set obtained by applying f to each element of s.
+map :: (a -> b) -> Set a -> Set b
+map f (Set   xs) = Set $ L.map f xs
+map f (Union xs) = Union $ L.map (map f) xs
 
 -- Conversion
 
