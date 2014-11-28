@@ -29,14 +29,23 @@ bartT  = H.BrC (H.C "bart")
 abeT :: H.Term
 abeT   = H.BrC (H.C "abe")
 
+xVarT :: H.Term
+xVarT = H.BrV (H.V "X")
+yVarT :: H.Term
+yVarT = H.BrV (H.V "Y")
+zVarT :: H.Term
+zVarT = H.BrV (H.V "Z")
+
 -- | An example program
 program :: H.Program
 program = [
     H.HornClause (H.Formula father [homerT, bartT]) []
   , H.HornClause (H.Formula father [abeT, homerT]) []
     -- grandfather should be defined with variables instead of atoms
-  , H.HornClause (H.Formula gFather [abeT, bartT])
-                 [H.Formula father [abeT, homerT], H.Formula father [homerT, bartT]]
+  -- , H.HornClause (H.Formula gFather [abeT, bartT])
+  --                [H.Formula father [abeT, homerT], H.Formula father [homerT, bartT]]
+  , H.HornClause (H.Formula gFather [xVarT, zVarT])
+                 [H.Formula father [xVarT, yVarT], H.Formula father [yVarT, zVarT]]
   ]
 
 firstTp :: S.Set H.Formula

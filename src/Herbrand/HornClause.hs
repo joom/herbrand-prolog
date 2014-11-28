@@ -12,23 +12,16 @@ data Relation = R String Int deriving (Show, Eq) -- R <fn name> <arity>
 
 type Language = (S.Set Constant, S.Set Function, S.Set Relation)
 
-data Term = BrC Constant
-          | BrV Variable
-          | BrF Function [Term]
+data Term = BrC {termConstant :: Constant}
+          | BrV {termVariable :: Variable}
+          | BrF {termFunction :: Function, termTerms :: [Term]}
           deriving (Show, Eq)
 
-data Formula = Formula Relation [Term] deriving (Show, Eq)
+data Formula = Formula {rel :: Relation, terms :: [Term]} deriving (Show, Eq)
 
-data HornClause = HornClause {head :: Formula, tail :: [Formula]}
+data HornClause = HornClause {head :: Formula, tail :: [Formula]} deriving (Show, Eq)
 
 type Program = [HornClause]
-
--- | An example language
--- lang1 :: Language
--- lang1 = (c,f,r)
---   where c = S.fromList [C "0", C "1", C "2"]
---         f = S.fromList [F "add" 2]
---         r = S.fromList [R "<" 2]
 
 -- | Set of all possible ground terms.
 -- This needs to be defined in proper set unions, you can ignore it for now.
@@ -40,3 +33,7 @@ groundTerms lang@(c, f, _) = S.unions [S.map BrC c, fnSet]
 -- | Checks if the tail of a Horn clause is empty.
 isFact :: HornClause -> Bool
 isFact = null . tail
+
+isVariable :: Term -> Bool
+isVariable (BrV _) = True
+isVariable _       = False

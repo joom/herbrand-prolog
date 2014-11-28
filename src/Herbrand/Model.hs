@@ -3,11 +3,18 @@ where
 
 import qualified Data.InfiniteSet as S
 import qualified Herbrand.HornClause as H
+import Data.List (nub)
 
 -- | Herbrand base of the language, all possible atomic formulae.
 -- Not implemented yet, not very necessary.
 herbrandBase :: H.Language -> S.Set H.Formula
 herbrandBase = undefined
+
+-- | Returns the list of variables in the Horn clause.
+findVars :: H.HornClause -> [H.Variable]
+findVars (H.HornClause hd tl) = nub $ concatMap findInFormula (hd:tl)
+  where findInFormula :: H.Formula -> [H.Variable]
+        findInFormula (H.Formula _ terms) = map H.termVariable $ filter H.isVariable terms
 
 -- | T_P operator is a function that builds the least Herbrand model.
 -- For each clause in the program, it checks if the tail is
@@ -17,6 +24,7 @@ tpOperator :: H.Program -> S.Set H.Formula -> S.Set H.Formula
 tpOperator program prev = foldl throwInHead S.empty $ filter tailInPrev program
   where tailInPrev :: H.HornClause -> Bool
         tailInPrev (H.HornClause hd tl) = all (`S.member` prev) tl
+        -- TODO: handle variables
         -- facts are handled automatically because of the function `all`
         throwInHead :: S.Set H.Formula -> H.HornClause -> S.Set H.Formula
         throwInHead s (H.HornClause hd _) = S.insert hd s
