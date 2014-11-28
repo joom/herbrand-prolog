@@ -16,9 +16,21 @@
 ----------------------------------------
 
 module Data.InfiniteSet
-where
+  (
+    -- data type itself
+    Set
+    -- Query
+  , null , size , member
+    -- Construction
+  , notMember , empty , singleton , insert , delete
+    -- Combine
+  , union , unions
+    -- Map
+  , map
+    -- Conversion
+  , toList , fromList) where
 
-import Prelude hiding (map)
+import Prelude hiding (map, null)
 import qualified Data.List as L
 
 data Set a = Set   [a]
@@ -45,7 +57,6 @@ size (Union xs) = sum $ L.map size xs
 member :: Eq a => a -> Set a -> Bool
 member x (Set   xs) = x `elem` xs
 member x (Union xs) = undefined -- TODO
-
 
 -- | Is the element not in the set?
 -- If the set is infinite and the element is not found,
