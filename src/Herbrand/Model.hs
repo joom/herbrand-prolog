@@ -4,6 +4,7 @@ where
 import qualified Data.InfiniteSet as S
 import qualified Herbrand.HornClause as H
 import Data.List (nub)
+import Control.Monad (replicateM)
 
 -- | Herbrand base of the language, all possible atomic formulae.
 -- Not implemented yet, not very necessary.
@@ -24,6 +25,25 @@ replaceVar (H.HornClause hd tl) varT@(H.BrV _) new =
         replaceFormula (H.Formula r terms) =
           H.Formula r $ map (\t -> if t == varT then new else t) terms
 replaceVar _ _ _ = error "You can only replace a variable."
+
+-- | True if the Horn clause has variables.
+hasVars :: H.HornClause -> Bool
+hasVars = null . findVars
+
+-- | Returns the non-ground clauses in the program.
+clausesWithVars :: H.Program -> [H.HornClause]
+clausesWithVars = filter hasVars
+
+-- | Replaces the variables in a Horn clause with all possible ground terms.
+-- Returns a list of all possible ground formulae spawning from that Horn clause.
+replaceVars :: H.Language -> H.HornClause -> [H.HornClause]
+replaceVars lang h@(H.HornClause hd tl) = map (applySubs h) combs
+  where vars = map H.BrV $ findVars h
+        gTerms = S.toList $ H.groundTerms lang
+        combs :: [[(H.Term, H.Term)]]
+        combs = map (zip vars) $ replicateM (length vars) gTerms
+        applySubs :: H.HornClause -> [(H.Term, H.Term)] -> H.HornClause
+        applySubs = foldl (\acc (vT,rT) -> replaceVar acc vT rT)
 
 -- | T_P operator is a function that builds the least Herbrand model.
 -- For each clause in the program, it checks if the tail is
