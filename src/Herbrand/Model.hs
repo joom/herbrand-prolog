@@ -3,7 +3,7 @@ where
 
 import qualified Data.InfiniteSet as S
 import qualified Herbrand.HornClause as H
-import Data.List (nub)
+import Data.List (nub, partition)
 import Control.Monad (replicateM)
 
 -- | Herbrand base of the language, all possible atomic formulae.
@@ -30,10 +30,6 @@ replaceVar _ _ _ = error "You can only replace a variable."
 hasVars :: H.HornClause -> Bool
 hasVars = null . findVars
 
--- | Returns the non-ground clauses in the program.
-clausesWithVars :: H.Program -> [H.HornClause]
-clausesWithVars = filter hasVars
-
 -- | Replaces the variables in a Horn clause with all possible ground terms.
 -- Returns a list of all possible ground formulae spawning from that Horn clause.
 replaceVars :: H.Language -> H.HornClause -> [H.HornClause]
@@ -45,12 +41,19 @@ replaceVars lang h@(H.HornClause hd tl) = map (applySubs h) combs
         applySubs :: H.HornClause -> [(H.Term, H.Term)] -> H.HornClause
         applySubs = foldl (\acc (vT,rT) -> replaceVar acc vT rT)
 
+-- | Program with the non-ground clauses replaced with all possible ground
+-- instances for that clause.
+groundProgram :: H.Language -> H.Program -> [H.HornClause]
+groundProgram l p = noVars ++ concatMap (replaceVars l) p
+  where (withVars, noVars) = partition hasVars p
+
 -- | T_P operator is a function that builds the least Herbrand model.
 -- For each clause in the program, it checks if the tail is
 -- a subset of the set of formulae it is given and throws in the
 -- head to the resulting set if the tail is a subset.
-tpOperator :: H.Program -> S.Set H.Formula -> S.Set H.Formula
-tpOperator program prev = foldl throwInHead S.empty $ filter tailInPrev program
+tpOperator :: H.Language -> H.Program -> S.Set H.Formula -> S.Set H.Formula
+tpOperator lang program prev =
+    foldl throwInHead S.empty $ filter tailInPrev (groundProgram lang program)
   where tailInPrev :: H.HornClause -> Bool
         tailInPrev (H.HornClause hd tl) = all (`S.member` prev) tl
         -- TODO: handle variables
@@ -60,16 +63,16 @@ tpOperator program prev = foldl throwInHead S.empty $ filter tailInPrev program
 
 -- | Creates a union of the results of T_P operators.
 -- For example, tpUpTo p S.empty 2 = T_P({}) \union T_P(T_P({}))
-tpUpTo :: H.Program -> S.Set H.Formula -> Int -> S.Set H.Formula
-tpUpTo p s upTo = tpAux 0 s
+tpUpTo :: H.Language -> H.Program -> S.Set H.Formula -> Int -> S.Set H.Formula
+tpUpTo l p s upTo = tpAux 0 s
   where tpAux n prev = if   n < upTo
                        then computed `S.union` tpAux (n + 1) computed
                        else S.empty
-          where computed = tpOperator p prev
+          where computed = tpOperator l p prev
 
 -- | Creates an infinite union of the results of T_P operators.
 -- For example, leastHerbrandModel p = T_P({}) \union T_P(T_P({})) \union ...
-leastHerbrandModel :: H.Program -> S.Set H.Formula
-leastHerbrandModel p = tpAux S.empty
+leastHerbrandModel :: H.Language -> H.Program -> S.Set H.Formula
+leastHerbrandModel l p = tpAux S.empty
   where tpAux prev = computed `S.union` tpAux computed
-          where computed = tpOperator p prev
+          where computed = tpOperator l p prev

@@ -49,10 +49,10 @@ program = [
   ]
 
 firstTp :: S.Set H.Formula
-firstTp = M.tpOperator program S.empty
+firstTp = M.tpOperator lang program S.empty
 
 secondTp :: S.Set H.Formula
-secondTp = M.tpOperator program firstTp
+secondTp = M.tpOperator lang program firstTp
 
 thirdTp :: S.Set H.Formula
-thirdTp = M.tpOperator program secondTp
+thirdTp = M.tpOperator lang program secondTp

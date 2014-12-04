@@ -56,7 +56,8 @@ size (Union xs) = sum $ L.map size xs
 -- it will never terminate, use at your own risk.
 member :: Eq a => a -> Set a -> Bool
 member x (Set   xs) = x `elem` xs
-member x (Union xs) = undefined -- TODO
+-- TODO: This should be implemented in the way described in the blog post
+member x (Union xs) = any (member x) xs
 
 -- | Is the element not in the set?
 -- If the set is infinite and the element is not found,
