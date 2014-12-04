@@ -1,8 +1,3 @@
-{-
-    % Equivalent of
-    father(homer,bart).
-    father(abe, homer).
--}
 module Family
 where
 
@@ -21,6 +16,10 @@ father :: H.Relation
 father = H.R "father" 2
 gFather :: H.Relation
 gFather = H.R "grandfather" 2
+mother :: H.Relation
+mother = H.R "mother" 2
+parent :: H.Relation
+parent = H.R "parent" 2
 
 homerT :: H.Term
 homerT = H.BrC (H.C "homer")
@@ -28,6 +27,11 @@ bartT :: H.Term
 bartT  = H.BrC (H.C "bart")
 abeT :: H.Term
 abeT   = H.BrC (H.C "abe")
+
+margeT :: H.Term
+margeT = H.BrC (H.C "marge")
+lisaT :: H.Term
+lisaT = H.BrC (H.C "lisa")
 
 xVarT :: H.Term
 xVarT = H.BrV (H.V "X")
@@ -40,12 +44,16 @@ zVarT = H.BrV (H.V "Z")
 program :: H.Program
 program = [
     H.HornClause (H.Formula father [homerT, bartT]) []
+  , H.HornClause (H.Formula father [homerT, lisaT]) []
   , H.HornClause (H.Formula father [abeT, homerT]) []
-    -- grandfather should be defined with variables instead of atoms
-  -- , H.HornClause (H.Formula gFather [abeT, bartT])
-  --                [H.Formula father [abeT, homerT], H.Formula father [homerT, bartT]]
+  , H.HornClause (H.Formula mother [margeT, bartT]) []
+  , H.HornClause (H.Formula mother [margeT, lisaT]) []
   , H.HornClause (H.Formula gFather [xVarT, zVarT])
                  [H.Formula father [xVarT, yVarT], H.Formula father [yVarT, zVarT]]
+  , H.HornClause (H.Formula parent [xVarT, yVarT])
+                 [H.Formula father [xVarT, yVarT]]
+  , H.HornClause (H.Formula parent [xVarT, yVarT])
+                 [H.Formula mother [xVarT, yVarT]]
   ]
 
 firstTp :: S.Set H.Formula

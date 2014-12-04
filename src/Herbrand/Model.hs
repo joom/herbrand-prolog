@@ -61,18 +61,13 @@ tpOperator lang program prev =
         throwInHead :: S.Set H.Formula -> H.HornClause -> S.Set H.Formula
         throwInHead s (H.HornClause hd _) = S.insert hd s
 
--- | Creates a union of the results of T_P operators.
--- For example, tpUpTo p S.empty 2 = T_P({}) \union T_P(T_P({}))
-tpUpTo :: H.Language -> H.Program -> S.Set H.Formula -> Int -> S.Set H.Formula
-tpUpTo l p s upTo = tpAux 0 s
-  where tpAux n prev = if   n < upTo
-                       then computed `S.union` tpAux (n + 1) computed
-                       else S.empty
-          where computed = tpOperator l p prev
-
 -- | Creates an infinite union of the results of T_P operators.
 -- For example, leastHerbrandModel p = T_P({}) \union T_P(T_P({})) \union ...
 leastHerbrandModel :: H.Language -> H.Program -> S.Set H.Formula
-leastHerbrandModel l p = tpAux S.empty
-  where tpAux prev = computed `S.union` tpAux computed
-          where computed = tpOperator l p prev
+leastHerbrandModel l p = tpBuild S.empty
+  where tpBuild :: S.Set H.Formula -> S.Set H.Formula
+        tpBuild s = if   computed == next
+                    then computed
+                    else tpBuild next
+          where computed = tpOperator l p s
+                next     = tpOperator l p computed

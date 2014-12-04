@@ -17,6 +17,7 @@ library
   exposed-modules:     Data.InfiniteSet
                      , Herbrand.HornClause
                      , Herbrand.Model
+                     , Prolog.Parser
   build-depends:       base >= 4.7 && <5
   hs-source-dirs:      src
   default-language:    Haskell2010
