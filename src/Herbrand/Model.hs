@@ -16,6 +16,15 @@ findVars (H.HornClause hd tl) = nub $ concatMap findInFormula (hd:tl)
   where findInFormula :: H.Formula -> [H.Variable]
         findInFormula (H.Formula _ terms) = map H.termVariable $ filter H.isVariable terms
 
+-- | Replaces a variable term with a different term in a Horn clause.
+replaceVar :: H.HornClause -> H.Term -> H.Term -> H.HornClause
+replaceVar (H.HornClause hd tl) varT@(H.BrV _) new =
+    H.HornClause (replaceFormula hd) (map replaceFormula tl)
+  where replaceFormula :: H.Formula -> H.Formula
+        replaceFormula (H.Formula r terms) =
+          H.Formula r $ map (\t -> if t == varT then new else t) terms
+replaceVar _ _ _ = error "You can only replace a variable."
+
 -- | T_P operator is a function that builds the least Herbrand model.
 -- For each clause in the program, it checks if the tail is
 -- a subset of the set of formulae it is given and throws in the
