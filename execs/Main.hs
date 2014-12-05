@@ -1,6 +1,7 @@
 -- REPL
 module Main where
 
+import Data.List (nub)
 import qualified Data.InfiniteSet as S
 import qualified Herbrand.HornClause as H
 import qualified Herbrand.Model as M
@@ -21,15 +22,18 @@ getFormula = do
     input <- getLine
     return $ P.readFormula input
 
--- | Takes the least Herbrand model and starts the REPL session with it.
-replStart :: S.Set H.Formula -> IO ()
-replStart lHM = do
+-- | Starts the REPL session.
+replStart :: H.Language -> S.Set H.Formula -> IO ()
+replStart lang lHM = do
     formula <- getFormula
-    -- TODO: handle variables
-    if formula `S.member` lHM
-    then putStrLn "yes"
-    else putStrLn "no"
-    replStart lHM
+    case M.findInFormula formula of
+      [] -> putStrLn $ if   formula `S.member` lHM
+                       then "yes"
+                       else "no"
+      _  -> putStrLn "Possible answers: " >> print correct
+            where spawning = M.replaceFormulaVars lang formula
+                  correct = nub $ filter (`S.member` lHM) spawning
+    replStart lang lHM
 
 main :: IO ()
 main = do
@@ -37,4 +41,4 @@ main = do
     program <- loadProgram
     let lang = H.generateLanguage program
     let lHM = M.leastHerbrandModel lang program
-    replStart lHM
+    replStart lang lHM
