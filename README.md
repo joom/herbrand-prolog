@@ -3,7 +3,9 @@ herbrand-prolog [![Build Status](https://secure.travis-ci.org/joom/herbrand-prol
 
 A pseudo-Prolog that tries to answer queries by building the least Herbrand model.
 
-Written as a final project for COMP360 Computational Logic and Logic Programming, Fall 2014, Prof. Lipton, Wesleyan University. In progress.
+Written as a final project for COMP360 Computational Logic and Logic Programming, Fall 2014, Prof. Lipton, Wesleyan University.
+
+[Here's a blog post about the development process of the project.](http://cattheory.com/posts/2014-12-05-herbrand.html)
 
 ## Limitations
 
@@ -13,7 +15,7 @@ Written as a final project for COMP360 Computational Logic and Logic Programming
 
 * You cannot use `\+`, `!.`.
 
-* You cannot use natural numbers.
+* You cannot use natural numbers or lists. You can only use constants and relations.
 
 ## Usage
 
@@ -32,6 +34,19 @@ Now you compiled the program. There is an example Prolog file in the "usage" fol
 ```
 
 Then you can ask questions like `reachable(istanbul, newhaven).`
+
+Here's an example REPL session for the Prolog program we have in usage/travel.prolog:
+
+```
+herbrand-prolog REPL
+?- reachable(istanbul, newhaven).
+yes
+?- reachable(meriden, X).
+Possible answers:
+[reachable/2(meriden, meriden),reachable/2(meriden, middletown),reachable/2(meriden, newhaven),reachable/2(meriden, istanbul),reachable/2(meriden, newyork)]
+?- reachable(istanbul, london).
+no
+```
 
 ## License
 

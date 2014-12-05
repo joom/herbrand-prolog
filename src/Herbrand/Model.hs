@@ -75,7 +75,6 @@ tpOperator lang program prev =
     foldl throwInHead S.empty $ filter tailInPrev (groundProgram lang program)
   where tailInPrev :: H.HornClause -> Bool
         tailInPrev (H.HornClause hd tl) = all (`S.member` prev) tl
-        -- TODO: handle variables
         -- facts are handled automatically because of the function `all`
         throwInHead :: S.Set H.Formula -> H.HornClause -> S.Set H.Formula
         throwInHead s (H.HornClause hd _) = S.insert hd s
