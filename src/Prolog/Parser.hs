@@ -46,6 +46,12 @@ parseFormulae = do
     optional spaces
     return (first:next)
 
+parseSingleFormula :: Parser H.Formula
+parseSingleFormula = do
+    formula <- parseFormula
+    char '.'
+    return formula
+
 -- should handle functions
 parseTerm :: Parser H.Term
 parseTerm = do
@@ -65,6 +71,11 @@ parseTerms = do
 
 readHornClause :: String -> H.HornClause
 readHornClause input = case parse parseHornClause "herbrand-prolog" input of
+    Left err -> error $ show err
+    Right val -> val
+
+readFormula :: String -> H.Formula
+readFormula input = case parse parseSingleFormula "herbrand-prolog" input of
     Left err -> error $ show err
     Right val -> val
 
