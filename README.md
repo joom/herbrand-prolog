@@ -48,6 +48,8 @@ Possible answers:
 no
 ```
 
+Note that the system build a language from your program, that has all the constants used in your program. This means that if you define a predicate like `always_say_yes(X,Y).`, and try `always_say_yes(hello,world).`, the system will say no, because `hello` and `world` are not in the language (unless they are used somewhere else in the program) and therefore the system doesn't include them into the least Herbrand model, since it tries to build the entire list of ground formulae.
+
 ## License
 
 [MIT License](http://joom.mit-license.org)

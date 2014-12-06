@@ -83,5 +83,5 @@ tpOperator lang program prev =
 -- | Creates an infinite union of the results of T_P operators.
 -- For example, leastHerbrandModel p = T_P({}) \union T_P(T_P({})) \union ...
 leastHerbrandModel :: H.Language -> H.Program -> S.Set H.Formula
-leastHerbrandModel l p = fst $ head $ filter (uncurry (==)) $ zip fs (tail fs)
+leastHerbrandModel l p = (fst . head . filter (uncurry (==)) . (zip <*> tail)) fs
   where fs = iterate (tpOperator l p) S.empty
