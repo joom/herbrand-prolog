@@ -5,6 +5,7 @@ import qualified Data.InfiniteSet as S
 import qualified Herbrand.HornClause as H
 import Data.List (nub, partition)
 import Control.Monad (replicateM)
+import Control.Applicative ((<*>))
 
 -- | Herbrand base of the language, all possible atomic formulae.
 -- Not implemented yet, not very necessary.
@@ -82,10 +83,5 @@ tpOperator lang program prev =
 -- | Creates an infinite union of the results of T_P operators.
 -- For example, leastHerbrandModel p = T_P({}) \union T_P(T_P({})) \union ...
 leastHerbrandModel :: H.Language -> H.Program -> S.Set H.Formula
-leastHerbrandModel l p = tpBuild S.empty
-  where tpBuild :: S.Set H.Formula -> S.Set H.Formula
-        tpBuild s = if   computed == next
-                    then computed
-                    else tpBuild next
-          where computed = tpOperator l p s
-                next     = tpOperator l p computed
+leastHerbrandModel l p = fst $ head $ filter (uncurry (==)) $ zip fs (tail fs)
+  where fs = iterate (tpOperator l p) S.empty
